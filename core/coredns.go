@@ -28,4 +28,5 @@ import (
 	_ "github.com/coredns/coredns/middleware/secondary"
 	_ "github.com/coredns/coredns/middleware/trace"
 	_ "github.com/coredns/coredns/middleware/whoami"
+	_ "github.com/coredns/coredns/middleware/gurdil"
 )

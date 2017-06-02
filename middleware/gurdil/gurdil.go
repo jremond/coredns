@@ -30,6 +30,18 @@ func (z Zone) GetDomain() string {
     return z.domain
 }
 
+func extractIPv4(s_ip string) (ip net.IP) {
+    s := strings.Split(s_ip, ".")
+    for i := 0; i < len(s); i++ {
+        p := net.ParseIP(strings.Join(s[i:i+4],"."))
+        if p != nil {
+            return p
+        }
+    }
+    return nil
+}
+
+
 // ServeDNS implements the middleware.Handler interface.
 func (wh Gurdil) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
     state := request.Request{W: w, Req: r}
@@ -45,10 +57,13 @@ func (wh Gurdil) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg)
     switch state.Family() {
     case 1:
         rr = new(dns.A)
-        s := strings.Split(state.QName(), "." + wh.Zone.GetDomain())
-        answer_ip := net.ParseIP(s[0]).To4()
         rr.(*dns.A).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeA, Class: state.QClass()}
-        rr.(*dns.A).A = answer_ip
+        zone_domain := wh.Zone.GetDomain()
+        zone_domain += "."
+        if strings.HasSuffix(state.QName(), zone_domain) {
+            answer_ip := extractIPv4(state.QName())
+            rr.(*dns.A).A = answer_ip
+        }
     case 2:
         rr = new(dns.AAAA)
         rr.(*dns.AAAA).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeAAAA, Class: state.QClass()}

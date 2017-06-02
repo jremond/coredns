@@ -18,20 +18,23 @@ type Gurdil struct{
     Zone
 }
 
+// Zone with one domain
 type Zone struct {
     domain string
 }
 
+// SetDomain puts the domain in the Zone
 func (z *Zone) SetDomain(name string) {
     z.domain = name
 }
 
+// GetDomain returnt the domain name from Zone
 func (z Zone) GetDomain() string {
     return z.domain
 }
 
-func extractIPv4(s_ip string) (ip net.IP) {
-    s := strings.Split(s_ip, ".")
+func extractIPv4(sIP string) (ip net.IP) {
+    s := strings.Split(sIP, ".")
     for i := 0; i < len(s); i++ {
         p := net.ParseIP(strings.Join(s[i:i+4],"."))
         if p != nil {
@@ -58,11 +61,11 @@ func (wh Gurdil) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg)
     case 1:
         rr = new(dns.A)
         rr.(*dns.A).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeA, Class: state.QClass()}
-        zone_domain := wh.Zone.GetDomain()
-        zone_domain += "."
-        if strings.HasSuffix(state.QName(), zone_domain) {
-            answer_ip := extractIPv4(state.QName())
-            rr.(*dns.A).A = answer_ip
+        zoneDomain := wh.Zone.GetDomain()
+        zoneDomain += "."
+        if strings.HasSuffix(state.QName(), zoneDomain) {
+            answerIP := extractIPv4(state.QName())
+            rr.(*dns.A).A = answerIP
         }
     case 2:
         rr = new(dns.AAAA)

@@ -35,8 +35,23 @@ func (z Zone) GetDomain() string {
 
 func extractIPv4(sIP string) (ip net.IP) {
     s := strings.Split(sIP, ".")
+    if len(s) > 4 {
+        for i := 0; i < len(s); i++ {
+            p := net.ParseIP(strings.Join(s[i:i+4],"."))
+            if p != nil {
+                return p
+            }
+        }
+    }
+    return nil
+}
+
+func extractIPv6(sIP string) (ip net.IP) {
+    // remove anyname before the IPv6 address
+    w := strings.Split(sIP, ".")
+    s := strings.Split(w[len(w)-1], ":")
     for i := 0; i < len(s); i++ {
-        p := net.ParseIP(strings.Join(s[i:i+4],"."))
+        p := net.ParseIP(strings.Join(s[i:],":"))
         if p != nil {
             return p
         }
@@ -54,26 +69,28 @@ func (wh Gurdil) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg)
     a.Compress = true
     a.Authoritative = true
 
-    ip := state.IP()
+    zoneDomain := "."
+    zoneDomain += wh.Zone.GetDomain()
+    zoneDomain += "."
+
     var rr dns.RR
 
-    switch state.Family() {
-    case 1:
-        rr = new(dns.A)
-        rr.(*dns.A).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeA, Class: state.QClass()}
-        zoneDomain := wh.Zone.GetDomain()
-        zoneDomain += "."
-        if strings.HasSuffix(state.QName(), zoneDomain) {
-            answerIP := extractIPv4(state.QName())
-            rr.(*dns.A).A = answerIP
-        }
-    case 2:
-        rr = new(dns.AAAA)
-        rr.(*dns.AAAA).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeAAAA, Class: state.QClass()}
-        rr.(*dns.AAAA).AAAA = net.ParseIP(ip)
+    rr = new(dns.A)
+    rr.(*dns.A).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeA, Class: state.QClass()}
+
+    if strings.HasSuffix(state.QName(), zoneDomain) {
+        answerIPv4 := extractIPv4(strings.TrimSuffix(state.QName(), zoneDomain))
+        rr.(*dns.A).A = answerIPv4
+        a.Answer = []dns.RR{rr}
     }
 
-    a.Answer = []dns.RR{rr}
+    rr = new(dns.AAAA)
+    rr.(*dns.AAAA).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeAAAA, Class: state.QClass()}
+    if strings.HasSuffix(state.QName(), zoneDomain) {
+        answerIPv6 := extractIPv6(strings.TrimSuffix(state.QName(), zoneDomain))
+        rr.(*dns.AAAA).AAAA = answerIPv6
+        a.Answer = []dns.RR{rr}
+    }
 
     state.SizeAndDo(a)
     w.WriteMsg(a)

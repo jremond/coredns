@@ -67,6 +67,7 @@ func reverseParse(c *caddy.Controller) (nets networks, fall bool, err error) {
 			var (
 				template = "ip-" + templateNameIP + ".{zone[1]}"
 				ttl      = 60
+                ip4separator   = "-"
 			)
 			for c.NextBlock() {
 				switch c.Val() {
@@ -75,6 +76,12 @@ func reverseParse(c *caddy.Controller) (nets networks, fall bool, err error) {
 						return nil, false, c.ArgErr()
 					}
 					template = c.Val()
+
+				case "ip4separator":
+					if !c.NextArg() {
+						return nil, false, c.ArgErr()
+					}
+					ip4separator = c.Val()
 
 				case "ttl":
 					if !c.NextArg() {
@@ -113,7 +120,7 @@ func reverseParse(c *caddy.Controller) (nets networks, fall bool, err error) {
 			// Create for each configured network in this stanza
 			for _, ipnet := range cidrs {
 				// precompile regex for hostname to ip matching
-				regexIP := regexMatchV4
+				regexIP := strings.Replace(regexMatchV4, "\\-", regexp.QuoteMeta(ip4separator), -1)
 				if ipnet.IP.To4() == nil {
 					regexIP = regexMatchV6
 				}
@@ -133,6 +140,7 @@ func reverseParse(c *caddy.Controller) (nets networks, fall bool, err error) {
 					Template:     template,
 					RegexMatchIP: regex,
 					TTL:          uint32(ttl),
+					Sep:          ip4separator,
 				})
 			}
 		}

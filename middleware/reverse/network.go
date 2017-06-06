@@ -13,6 +13,7 @@ type network struct {
 	Template     string
 	TTL          uint32
 	RegexMatchIP *regexp.Regexp
+	Sep          string
 }
 
 // TODO: we might want to get rid of these regexes.
@@ -32,7 +33,7 @@ func (network *network) hostnameToIP(rname string) net.IP {
 	}
 
 	if network.IPnet.IP.To4() != nil {
-		matchedIP = net.ParseIP(strings.Replace(match[1], "-", ".", 4))
+		matchedIP = net.ParseIP(strings.Replace(match[1], network.Sep, ".", 4))
 	} else {
 		// TODO: can probably just allocate a []byte and use that.
 		var buf bytes.Buffer
@@ -58,9 +59,9 @@ func (network *network) hostnameToIP(rname string) net.IP {
 func (network *network) ipToHostname(ip net.IP) (name string) {
 	if ipv4 := ip.To4(); ipv4 != nil {
 		// replace . to -
-		name = uitoa(ipv4[0]) + "-" +
-			uitoa(ipv4[1]) + "-" +
-			uitoa(ipv4[2]) + "-" +
+		name = uitoa(ipv4[0]) + network.Sep +
+			uitoa(ipv4[1]) + network.Sep +
+			uitoa(ipv4[2]) + network.Sep +
 			uitoa(ipv4[3])
 	} else {
 		// assume v6

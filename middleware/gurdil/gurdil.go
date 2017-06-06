@@ -3,6 +3,7 @@
 package gurdil
 
 import (
+	"log"
 	"net"
 	"strings"
 
@@ -35,8 +36,9 @@ func (z Zone) GetDomain() string {
 
 func extractIPv4(sIP string) (ip net.IP) {
     s := strings.Split(sIP, ".")
-    if len(s) > 4 {
+    if len(s) > 3 {
         for i := 0; i < len(s); i++ {
+            log.Print("%v\n",strings.Join(s[i:i+4],"."))
             p := net.ParseIP(strings.Join(s[i:i+4],"."))
             if p != nil {
                 return p
@@ -75,23 +77,29 @@ func (wh Gurdil) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg)
 
     var rr dns.RR
 
-    rr = new(dns.A)
-    rr.(*dns.A).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeA, Class: state.QClass()}
 
     if strings.HasSuffix(state.QName(), zoneDomain) {
+        rr = new(dns.A)
+        rr.(*dns.A).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeA, Class: state.QClass()}
         answerIPv4 := extractIPv4(strings.TrimSuffix(state.QName(), zoneDomain))
+        log.Print("%v \n", state.QName())
+        log.Print("%v\n", zoneDomain)
+        log.Print(strings.TrimSuffix(state.QName(), zoneDomain))
+        log.Print("%v\n", answerIPv4)
         rr.(*dns.A).A = answerIPv4
+        log.Print("%v\n", rr)
         a.Answer = []dns.RR{rr}
     }
 
-    rr = new(dns.AAAA)
-    rr.(*dns.AAAA).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeAAAA, Class: state.QClass()}
     if strings.HasSuffix(state.QName(), zoneDomain) {
+        rr = new(dns.AAAA)
+        rr.(*dns.AAAA).Hdr = dns.RR_Header{Name: state.QName(), Rrtype: dns.TypeAAAA, Class: state.QClass()}
         answerIPv6 := extractIPv6(strings.TrimSuffix(state.QName(), zoneDomain))
         rr.(*dns.AAAA).AAAA = answerIPv6
-        a.Answer = []dns.RR{rr}
+        //        a.Answer = []dns.RR{rr}
     }
 
+    log.Print("%v\n", a)
     state.SizeAndDo(a)
     w.WriteMsg(a)
 

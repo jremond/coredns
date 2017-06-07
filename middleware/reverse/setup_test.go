@@ -157,6 +157,11 @@ func TestSetupParse(t *testing.T) {
 				RegexMatchIP: regexIpv6dynamic,
 			}},
 		},
+		{
+			`wildcard`,
+			false,
+			networks{},
+		},
 	}
 	for i, test := range tests {
 		c := caddy.NewTestController("dns", test.inputFileRules)

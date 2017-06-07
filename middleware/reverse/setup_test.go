@@ -36,6 +36,7 @@ func TestSetupParse(t *testing.T) {
 				Zone:         "domain.com.",
 				TTL:          60,
 				RegexMatchIP: regexIP6,
+				Sep:          "-",
 			}},
 		},
 		{
@@ -111,12 +112,14 @@ func TestSetupParse(t *testing.T) {
 				Zone:         "dynamic.domain.com.",
 				TTL:          50,
 				RegexMatchIP: regexIpv6dynamic,
+				Sep:          "-",
 			}, network{
 				IPnet:        net4,
 				Template:     "dynamic-{ip}-vpn.dynamic.domain.com.",
 				Zone:         "dynamic.domain.com.",
 				TTL:          60,
 				RegexMatchIP: regexIpv4vpndynamic,
+				Sep:          "-",
 			}},
 		},
 		{
@@ -133,12 +136,14 @@ func TestSetupParse(t *testing.T) {
 				Zone:         "dynamic.domain.com.",
 				TTL:          50,
 				RegexMatchIP: regexIpv6dynamic,
+				Sep:          "-",
 			}, network{
 				IPnet:        net4,
 				Template:     "dynamic-{ip}-intern.dynamic.domain.com.",
 				Zone:         "dynamic.domain.com.",
 				TTL:          50,
 				RegexMatchIP: regexIpv4dynamic,
+				Sep:          "-",
 			}},
 		},
 		{
@@ -155,6 +160,7 @@ func TestSetupParse(t *testing.T) {
 				Zone:         "dynamic.domain.com.",
 				TTL:          300,
 				RegexMatchIP: regexIpv6dynamic,
+				Sep:          "-",
 			}},
 		},
 	}

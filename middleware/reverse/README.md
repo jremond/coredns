@@ -9,13 +9,27 @@ reverse NETWORK... {
     hostname TEMPLATE
     [ttl TTL]
     [fallthrough]
+    [wildcard]
+    [ip4separator CHARACTER]
 ~~~
 
 * **NETWORK** one or more CIDR formatted networks to respond on.
 * `hostname` injects the IP and zone to a template for the hostname. Defaults to "ip-{IP}.{zone[1]}". See below for template.
 * `ttl` defaults to 60
 * `fallthrough` If zone matches and no record can be generated, pass request to the next middleware.
+* `wildcard` allows you to activate a wildcard DNS 
+* `ip4separator` allows to change the separator of IPv4 address used in A record
 
+### wildcard
+
+If `wildcard` is true :
+any.thing.ip-1-2-3-4.example.org resolves to 1.2.3.4 (ip-{ip}.{zone} is the hostname/template)
+
+### ip4separator
+
+If `ip4separator` is "." 
+ip-{ip}.{zone} expands to ip-1.2.3.4.example.org instead of ip-1-2-3-4.example.org
+ 
 ### Template Syntax
 
 The template for the hostname is used for generating the PTR for a reverse lookup and matching the

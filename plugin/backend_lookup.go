@@ -339,6 +339,22 @@ func TXT(b ServiceBackend, zone string, state request.Request, opt Options) (rec
 	return records, nil
 }
 
+// CAA returns CAA records from Backend or an error.
+func CAA(b ServiceBackend, zone string, state request.Request, opt Options) (records []dns.RR, err error) {
+	services, err := b.Services(state, false, opt)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, serv := range services {
+		if serv.Text == "" {
+			continue
+		}
+		records = append(records, serv.NewCAA(state.QName()))
+	}
+	return records, nil
+}
+
 // PTR returns the PTR records from the backend, only services that have a domain name as host are included.
 func PTR(b ServiceBackend, zone string, state request.Request, opt Options) (records []dns.RR, err error) {
 	services, err := b.Reverse(state, true, opt)

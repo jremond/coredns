@@ -72,6 +72,11 @@ func (s *Service) NewTXT(name string) *dns.TXT {
 	return &dns.TXT{Hdr: dns.RR_Header{Name: name, Rrtype: dns.TypeTXT, Class: dns.ClassINET, Ttl: s.TTL}, Txt: split255(s.Text)}
 }
 
+// NewCAA returns a new CAA record based on the Service.
+func (s *Service) NewCAA(name string) *dns.CAA {
+	return &dns.CAA{Hdr: dns.RR_Header{Name: name, Rrtype: dns.TypeCAA, Class: dns.ClassINET, Ttl: s.TTL}, Value: s.Text}
+}
+
 // NewPTR returns a new PTR record based on the Service.
 func (s *Service) NewPTR(name string, target string) *dns.PTR {
 	return &dns.PTR{Hdr: dns.RR_Header{Name: name, Rrtype: dns.TypePTR, Class: dns.ClassINET, Ttl: s.TTL}, Ptr: dns.Fqdn(target)}

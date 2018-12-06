@@ -55,6 +55,8 @@ func (e *Etcd) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 		records, extra, err = plugin.SRV(e, zone, state, opt)
 	case dns.TypeSOA:
 		records, err = plugin.SOA(e, zone, state, opt)
+	case dns.TypeCAA:
+		records, err = plugin.CAA(e, zone, state, opt)
 	case dns.TypeNS:
 		if state.Name() == zone {
 			records, extra, err = plugin.NS(e, zone, state, opt)

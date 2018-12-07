@@ -63,6 +63,8 @@ var services = []*msg.Service{
 	{Host: "2003::8:2", Key: "a4.apex.dns.skydns_zoned.test."},
 	// Reverse.
 	{Host: "reverse.example.com", Key: "1.0.0.10.in-addr.arpa."}, // 10.0.0.1
+	// CAA
+	{Host: "caa.skydns.test", Flag: 0, Tag: "iodef", Value: "mailto:owner@skydns.test"},
 }
 
 var dnsTestCases = []test.Case{
@@ -273,6 +275,11 @@ var dnsTestCases = []test.Case{
 	{
 		Qname: "1.0.0.10.in-addr.arpa.", Qtype: dns.TypePTR,
 		Answer: []dns.RR{test.PTR("1.0.0.10.in-addr.arpa. 300 PTR reverse.example.com.")},
+	},
+	// CAA
+	{
+		Qname: "caa.skydns.test", Qtype: dns.TypeCAA,
+		Answer: []dns.RR{test.CAA("caa.skydns.test. 60 IN CAA 0 iodef mailto:owner@skydns.test")},
 	},
 }
 

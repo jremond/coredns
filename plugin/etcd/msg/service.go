@@ -34,6 +34,11 @@ type Service struct {
 
 	// Etcd key where we found this service and ignored from json un-/marshalling
 	Key string `json:"-"`
+
+	// CAA records require a Flag and a Tag
+	Flag  int    `json:"flag,omitempty"`
+	Tag   string `json:"tag,omitempty"`
+	Value string `json:"value,omitempty"`
 }
 
 // NewSRV returns a new SRV record based on the Service.
@@ -74,7 +79,7 @@ func (s *Service) NewTXT(name string) *dns.TXT {
 
 // NewCAA returns a new CAA record based on the Service.
 func (s *Service) NewCAA(name string) *dns.CAA {
-	return &dns.CAA{Hdr: dns.RR_Header{Name: name, Rrtype: dns.TypeCAA, Class: dns.ClassINET, Ttl: s.TTL}, Value: s.Text}
+	return &dns.CAA{Hdr: dns.RR_Header{Name: name, Rrtype: dns.TypeCAA, Class: dns.ClassINET, Ttl: s.TTL}, Value: s.Value, Tag: s.Tag, Flag: uint8(s.Flag)}
 }
 
 // NewPTR returns a new PTR record based on the Service.

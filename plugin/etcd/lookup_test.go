@@ -64,7 +64,7 @@ var services = []*msg.Service{
 	// Reverse.
 	{Host: "reverse.example.com", Key: "1.0.0.10.in-addr.arpa."}, // 10.0.0.1
 	// CAA
-	{Host: "caa.skydns.test", Flag: 0, Tag: "iodef", Value: "mailto:owner@skydns.test"},
+	{Key: "caa.skydns.test", Flag: 0, Tag: "iodef", Value: "mailto:owner@skydns.test"},
 }
 
 var dnsTestCases = []test.Case{

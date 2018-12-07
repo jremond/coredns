@@ -214,3 +214,16 @@ If you query the zone name for `TXT` now, you will get the following response:
 % dig +short skydns.local TXT @localhost
 "this is a random text message."
 ~~~
+
+### CAA record
+
+If you would like to use `CAA` records, you can set the following:
+~~~
+% etcdctl put /skydns/local/skydns/x1 '{"ttl":60,"value":"mailto:owner@skydns.local","flag":0,"tag":"iodef"}
+~~~
+
+If you query the zone name for `CAA` now, you will get the following response:
+~~~ sh
+% dig +short skydns.local CAA @localhost
+"0 iodef "mailto:owner@example.com"
+~~~
